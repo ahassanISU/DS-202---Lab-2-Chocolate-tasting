@@ -1,0 +1,94 @@
+---
+title: "individual 1"
+author: "Ahmed Hassan"
+date: "9/13/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# installs packages for data
+suppressPackageStartupMessages( require(ggplot2))
+suppressPackageStartupMessages( require(dplyr))
+suppressPackageStartupMessages( require(ggpubr))
+
+#Loads the packages 
+library(ggplot2)
+library(dplyr)
+library(ggpubr)
+```
+
+
+ 
+```{r}
+#Question 1: How are the ratings distributed? Create both a histogram and a boxplot and describe them. Don’t forget to mention outliers, if there are any.
+choco <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/data/choco.csv") 
+str(choco)
+hist(choco$Rating)
+boxplot(choco$Rating)
+```
+```
+Discussion || Q1:
+Histogram: As we can see from the Histogram, the distribution is Skewed to the Left. With a the most frequent count being the rating of 3.5. This graph appears to be bimodal with 2 peaks.
+
+Boxplot: As you can see above, based on the Boxplot, that there are Outliers visable between ratings 1 through 3 on the x axis. 
+```
+
+
+Question 2: How does the number of ratings depend on the year? Draw a bar chart of the number of reports.
+```{r}
+counts <- table(choco$Date)
+barplot(counts, main = "How does the number of ratings depend on the year?")
+
+```
+Question 3: Do ratings depend on the cacao percentage of a chocolate bar? Create both numerical and graphical summaries, and explain.
+```{r}
+cor(x = choco$Rating, y = choco$Cocoa_Percent) #numerical summary
+plot(choco$Rating, choco$Cocoa_Percent) # graphical summary
+```
+
+Question 4: How do different characteristics of the chocolate compare? To elaborate, which characteristics tend to be more favorable and which ones are not? Create both numerical and graphical summaries, and explain.
+
+```{r}
+chars <- unique(c(as.character(choco$Characteristics1), as.character(choco$Characteristics2), as.character(choco$Characteristics3), as.character(choco$Characteristics4))) 
+chars <- chars[!is.na(chars) & chars != ""]
+#chars
+
+charFunction <- function(targetChar){
+  choco[,targetChar] <- !is.na(choco$Characteristics1) & choco$Characteristics1 == targetChar | !is.na(choco$Characteristics2) & choco$Characteristics2 == targetChar | !is.na(choco$Characteristics3) & choco$Characteristics3 == targetChar | !is.na(choco$Characteristics4) & choco$Characteristics4 == targetChar 
+  summary(choco[choco[,targetChar], "Rating"])
+  barplot(table(choco[choco[,targetChar], targetChar], choco[choco[,targetChar], "Rating"]),  main = targetChar)
+}
+charFunction("banana")
+#Banana seems to be the most favored flavor of choocolates with  14 bars having a 3.5 rating.
+charFunction("cherry")
+#Cherry also seems to be generally favorable as it has 29 flavors in between 3 and 4 ratings.
+charFunction("chocolatey")
+#Chocolatey flavored  is also generally favorable because of all  all its flavors in between 3 and 3.75
+charFunction("dirty")
+#Dirty has many flavors between 2.5 to 3.5, as shows on the graph. 
+charFunction("toast")
+#Toast has two bars, one in 3 and another in 3.5, making it the second least favora ble.
+charFunction("intense vinegar")
+#Intense vinegar has a rating of 2.5, makin git the least favorable.
+
+```
+5.Brainstorm two analyses you would like to perform with your teammate. Describe in plain language what comparisons are you making. Create suitable numerical and graphical summaries for your analyses. Describe the results.
+
+For our analysis, we wanted to determine which the USA Chocolate companies listed below, generated the most ratings.
+
+```{r}
+
+create <- function(BO){
+  barplot(table(choco[!is.na(choco$Rating) & choco$Company == BO, "Bean_Origin"], choco[!is.na(choco$Rating) & choco$Company == BO, "Rating"] ), main = BO)
+  print(summary(choco[!is.na(choco$Rating) & choco$Company == BO, "Rating"]))
+}
+
+create("5150")
+create("Theo")
+create("Bittersweet Origins")
+create("Guittard")
+create("Chuao Chocolatier")
+```
+Based on out findings, we can see that the company named Guittard generated the most ratings with a hogh count of 7 on both 3 and 3.5 ratings, and that could be based on the variety that this company provides. Bittersweet Origins would fall on second place with with a max count of 5 on the 3 rating. The company named Chuao Chocolatier generated the least amount of ratings.

@@ -1,0 +1,75 @@
+---
+title: "Lab2"
+author: "Wil Hillmer"
+date: "9/14/2020"
+output: html_document
+```{r}
+choco <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/data/choco.csv") 
+str(choco)
+Rate <- (choco$Rating)
+hist(Rate)
+boxplot(Rate)
+#most of the ratings lie between 2.75 and 3.75 with an average of 3.25. The outliers are around 1.0 and 2.0. 4.0 is not concidered an outlier. 
+```{r}
+Year <- (choco$Date)
+barplot(table(choco$Date), main = "Year and Ratings")
+Cocoa <- (choco$Cocoa_Percent)
+qqnorm(choco$Rating)
+qqline(choco$Rating)
+qqnorm(choco$Cocoa_Percent)
+qqline(choco$Cocoa_Percent)
+library(ggplot2)
+test_results <- data.frame(
+  score = c(choco$Rating, choco$Cocoa_Percent),
+  Test = c(
+    rep("Rate", length(choco$Rating)),
+    rep("Cocoa", length(choco$Cocoa_Percent))
+  )
+)
+ggplot(test_results, aes(x = Test, y= score, color = Test)) +
+geom_boxplot() +
+geom_jitter() +
+scale_color_brewer(type = "qual", palette = 2) +
+theme_minimal() +
+theme(legend.position = "none")
+delta_0 <- 0
+
+sigma_sq_1 <- 3
+sigma_sq_2 <- 2
+
+n_1 <- length(choco$Rating)
+n_2 <- length(choco$Cocoa_Percent)
+
+z_stat <- (mean(choco$Rating) - mean(choco$Cocoa_Percent) - delta_0) / 
+  sqrt(sigma_sq_1 / n_1 + sigma_sq_2 / n_2)
+
+z_stat
+boxplot(choco$Cocoa_Percent)
+boxplot(choco$Rating)
+#With such a high Z_score we can Reject the null hypthosis of Rate=Cocoa. This means that that the ratings do not depend on the Cocoa Percentage.
+boxplot(choco$Cocoa_Percent)
+boxplot(Rate)
+```{r}
+Car1 <- (choco$Characteristics1)
+Car2 <- (choco$Characteristics2)
+Car3 <- (choco$Characteristics3)
+Car4 <- (choco$Characteristics4)
+barplot(table(Car1))
+barplot(table(Car2))
+barplot(table(Car3))
+barplot(table(Car4))
+#The perfered characteristics of the chocolates would be; Choco, mint, powdery,pure, dirt,sweet, candy, and salt .
+```{r}
+# For our two analysis we are going to test the rating compaired to the Location and the rating comapired to the Comapny that produced the chocholate.
+create <- function(BO){
+  barplot(table(choco[!is.na(Rate) & choco$Bean_Origin == BO, "Bean_Origin"], choco[!is.na(Rate) & choco$Bean_Origin == BO, "Rating"] ), main = BO)
+  print(summary(choco[!is.na(Rate) & choco$Bean_Origin == BO, "Rating"]))
+}
+
+create("Colombia")
+create("U.S.A.")
+create("Ghana")
+create("Peru")
+create("Vietnam")
+#Based on our results we can determine that All five countries selected produce chocolate with fairly high ratings. The median for all countries was 3.25 which is Classed as Recomended.
+
